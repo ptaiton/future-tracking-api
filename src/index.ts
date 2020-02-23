@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { json } from 'body-parser'
 import { configureRouter } from './router/router'
+import { config } from './services/configService'
 import './services/dbService'
 
 
@@ -16,8 +17,8 @@ const startServer = () => {
   
   configureRouter(app)
 
-  app.listen(5000, () => {
-    console.log('Listening on port 5000')
+  app.listen(config.LISTEN_PORT, () => {
+    console.log(`Listening on port ${config.LISTEN_PORT}`)
   })
 }
 

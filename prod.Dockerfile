@@ -1,4 +1,14 @@
 FROM node:12.13.0-alpine
-COPY build/ .
+COPY build/ /usr/app
+
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
+ARG MYSQL_HOST
+
+ENV LISTEN_PORT=80
+ENV MYSQL_USER=${MYSQL_USER}
+ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
+ENV MYSQL_HOST=${MYSQL_HOST}
+
 EXPOSE 80
-CMD ["node", "server.js"]
+CMD ["node", "/usr/app/index.js"]

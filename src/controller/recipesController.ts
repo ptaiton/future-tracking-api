@@ -11,15 +11,20 @@ export const getRecipes = async (req: Request, res: Response) => {
 }
 
 export const generatePdf = async (req: Request, res: Response) => {
-  const ids = req.body.ids
+  const ids = req.body.recipeIds
+  const title = req.body.title
   if(ids) {
     try {
-      const pdf = await recipesService.generatePdf(ids)
+      const pdf = await recipesService.generatePdf(ids, title)
+      res.set({
+        'Content-Disposition': `attachment; filename=${title}.pdf`,
+        'Content-Type': 'application/pdf'
+      })
       res.send(pdf)
     } catch (err) {
       res.send(err)
     }
   } else {
-    res.send("Bad request, you must provide ids")
+    res.send("Bad request, you must provide a title and some recipe ids")
   }
 }

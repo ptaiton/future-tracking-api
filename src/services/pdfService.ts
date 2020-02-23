@@ -1,33 +1,32 @@
-import PDFDocument from 'pdfkit'
+import mdPdf from 'markdown-pdf'
 import { Recipe } from '../types/Recipe'
 
-export const generatePdfFromRecipes = (recipes: Recipe[]) => 
+export const generatePdfFromRecipes = (recipes: Recipe[], title: string) => 
   new Promise<Buffer>((resolve, reject) => {
-    const doc = new PDFDocument
+    let pdfString = `# ${title}`
     
     recipes.forEach((recipe, idx) => {
-      if(idx > 0) {
-        doc.addPage()
-      }
-      doc.fontSize(30).text(recipe.name)
-      doc.text(`For : ${recipe.numberOfPersons} persons`)
-      doc.text(' ')
-      doc.fontSize(18).text(`Ingrédients : `)
+      pdfString += `
+        ## ${recipe.name}\n
+        For : ${recipe.numberOfPersons} persons\n\n
+        Ingrédients :
+      `
       recipe.ingredients.forEach((ingredient) => {
-        doc.fontSize(14).text(`${ingredient.name} : ${ingredient.quantity} ${ingredient.unit}`)
+        pdfString += `${ingredient.name} : ${ingredient.quantity} ${ingredient.unit}\n`
       })
-      doc.text(' ')
-      doc.fontSize(18).text(`Etapes : `)
+      
+      pdfString += `Etapes : `
       recipe.steps.forEach((step) => {
-        doc.fontSize(14).text(`${step.number} : ${step.description}`)
+        pdfString += `${step.number} : ${step.description}`
       })
     })
 
-
-    const buffers: Buffer[] = []
-    doc.on('data', buffers.push.bind(buffers))
-    doc.on('end', () => {
-        resolve(Buffer.concat(buffers))
+    //@ts-ignore
+    mdPdf().from.string(pdfString).to.buffer(null, (err: any, pdfBuffer: Buffer) => {
+      if(err) {
+        return reject(err)
+      }
+      
+      resolve(pdfBuffer)
     })
-    doc.end()
   })

@@ -9,10 +9,13 @@ export const getRecipes = () => {
     .then(rawRecipesToRecipes)
 }
 
-export const generatePdf = (ids: string[]) => {
+export const generatePdf = (ids: string[], title: string) => {
   return getRecipesByIds(ids)
     .then(
-      pipe(rawRecipesToRecipes, generatePdfFromRecipes)
+      pipe(
+        rawRecipesToRecipes,
+        ids => generatePdfFromRecipes(ids, title)
+      )
     )
 }
 
