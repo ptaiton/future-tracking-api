@@ -1,21 +1,31 @@
 version: '3'
 
 services:
-
   db:
     image: gcr.io/future-tracking/future-tracking-mysql-migrations
     container_name: db
     ports: 
       - 3306:3306
-    networks:
+    environment: 
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_USER=future-tracking
+      - MYSQL_PASSWORD=password
+    networks: 
       - net
-
+    
   api:
     image: gcr.io/future-tracking/future-tracking-api
     container_name: api
+    restart: always
     ports: 
       - 5001:80
-    networks:
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=future-tracking
+      - MYSQL_PASSWORD=password
+    links:
+      - db
+    networks: 
       - net
 
   app:
@@ -23,9 +33,13 @@ services:
     container_name: app
     ports: 
       - 8080:80
-    networks:
+    environment: 
+      - "API_URL=http://localhost:5001"
+    links:
+      - api
+    networks: 
       - net
 
 networks:
   net:
-    driver: bridge
+    driver: "bridge"
